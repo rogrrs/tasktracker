@@ -20,6 +20,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=2008
       - POSTGRES_DB=tasktracker
+    ports:
+      - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
