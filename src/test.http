@@ -1,0 +1,24 @@
+### Создать задачу
+POST http://localhost:9090/tasks
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzc5MTkxMTIyLCJleHAiOjE3NzkyNzc1MjJ9.MDKJJvDJOU2zcVDCMn229ZWO_ACO47iiJWixtso-WaPSxHHt5TFuiEFyEb2YuQQpjKoa1kO2vvTV5ET4rup_Vw
+
+{
+  "title": "Новая задача",
+  "description": "Нужно сделать проект тасктрекер на Java"
+}
+
+### Авторизация
+POST http://localhost:9090/login
+Content-Type: application/json
+
+{
+"email": "test@test.com",
+"password": "password"
+}
+
+### Получить список моих задач
+GET http://localhost:9090/tasks
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzc5MTkxMTIyLCJleHAiOjE3NzkyNzc1MjJ9.MDKJJvDJOU2zcVDCMn229ZWO_ACO47iiJWixtso-WaPSxHHt5TFuiEFyEb2YuQQpjKoa1kO2vvTV5ET4rup_Vw
+
+
