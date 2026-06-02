@@ -1,17 +1,29 @@
 package com.example.tasktracker.dto;
 
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class AuthDto {
     public record RegistrationRequest(
-            @Email String email,
-            @Size(min = 4) String password,
+            @Pattern(
+                    regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
+                    message = "Некорректный формат email"
+            )
+            String email,
+
+            @Size(min = 4, message = "Пароль должен быть не менее 4 символов")
+            String password,
+
             String repeatPassword
     ) {}
 
     public record LoginRequest(
-            @Email String email,
+            @Pattern(
+                    regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
+                    message = "Некорректный формат email"
+            )
+            String email,
+
             String password
     ) {}
 
