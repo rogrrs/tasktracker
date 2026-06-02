@@ -128,4 +128,10 @@ public class TaskService {
                 task.getAssignee() != null ? task.getAssignee().getId() : null
         );
     }
+
+    public List<TaskResponse> getAllTasksInSystem() {
+        return taskRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }
