@@ -49,4 +49,9 @@ public class TaskController {
     public void delete(@PathVariable Long id, @AuthenticationPrincipal User user) {
         taskService.deleteTask(id, user);
     }
+
+    @GetMapping("/all-system")
+    public List<TaskResponse> getAllSystemTasks() {
+        return taskService.getAllTasksInSystem();
+    }
 }
