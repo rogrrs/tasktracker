@@ -30,7 +30,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("Точка входа /register: Успешный ответ")
     void register_ShouldReturn200() throws Exception {
-        RegistrationRequest req = new RegistrationRequest("new@test.com", "pass123", "pass123");
+        RegistrationRequest req = new RegistrationRequest("new@mail.ru", "pass123", "pass123");
         when(authService.register(any())).thenReturn("token123");
 
         mockMvc.perform(post("/register")

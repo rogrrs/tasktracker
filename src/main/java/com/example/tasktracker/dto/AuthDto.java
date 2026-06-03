@@ -6,8 +6,8 @@ import jakarta.validation.constraints.Size;
 public class AuthDto {
     public record RegistrationRequest(
             @Pattern(
-                    regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
-                    message = "Некорректный формат email"
+                    regexp = "^[A-Za-z0-9._%+-]+@(gazprom-neft\\.ru|mail\\.ru|yandex\\.ru|gmail\\.com)$",
+                    message = "Допустима только латиница и домены gazprom-neft.ru, mail.ru, yandex.ru, gmail.com"
             )
             String email,
 
@@ -19,8 +19,8 @@ public class AuthDto {
 
     public record LoginRequest(
             @Pattern(
-                    regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
-                    message = "Некорректный формат email"
+                    regexp = "^[A-Za-z0-9._%+-]+@(gazprom-neft\\.ru|mail\\.ru|yandex\\.ru|gmail\\.com)$",
+                    message = "Допустима только латиница и домены: gazprom-neft.ru, mail.ru, yandex.ru, gmail.com"
             )
             String email,
 

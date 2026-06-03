@@ -1,6 +1,7 @@
 package com.example.tasktracker.service;
 
 import com.example.tasktracker.model.Status;
+import com.example.tasktracker.model.Task;
 import com.example.tasktracker.model.User;
 import com.example.tasktracker.repository.TaskRepository;
 import com.example.tasktracker.repository.UserRepository;
@@ -9,6 +10,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +26,17 @@ public class ReportService {
     }
 
     private void sendReportToUser(User user) {
-        var tasks = taskRepository.findAllByOwner(user);
+        List<Task> tasks = taskRepository.findAllByOwnerOrAssignee(user, user);
+
         long waiting = tasks.stream().filter(t -> t.getStatus() == Status.WAITING).count();
         long done = tasks.stream().filter(t -> t.getStatus() == Status.DONE).count();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
-        message.setSubject("Daily Task Report");
-        message.setText("Hello! Here is your task summary:\n" +
-                "- WAITING: " + waiting + "\n" +
-                "- DONE: " + done);
+        message.setSubject("Ежедневный отчет по задачам");
+        message.setText("Здравствуйте! Ваша сводка по задачам на сегодня:\n" +
+                "- В работе (WAITING): " + waiting + "\n" +
+                "- Выполнено (DONE): " + done);
 
         try {
             mailSender.send(message);

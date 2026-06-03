@@ -36,32 +36,29 @@ public class TaskService {
         return mapToResponse(taskRepository.save(task));
     }
 
-    public List<TaskResponse> getAllMyTasks(User owner) {
-        return taskRepository.findAllByOwner(owner).stream()
+    public List<TaskResponse> getAllMyTasks(User user) {
+        return taskRepository.findAllByOwnerOrAssignee(user, user).stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
     public TaskResponse getTaskById(Long id, User user) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        checkAccess(task, user);
+        Task task = getTaskOrThrow(id);
+        checkIsOwnerOrAssignee(task, user);
         return mapToResponse(task);
     }
 
     public TaskResponse updateTask(Long id, TaskRequest request, User user) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        checkAccess(task, user);
+        Task task = getTaskOrThrow(id);
+        checkIsOwner(task, user);
         task.setTitle(request.title());
         task.setDescription(request.description());
         return mapToResponse(taskRepository.save(task));
     }
 
     public TaskResponse updateStatus(Long id, boolean done, User user) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        checkAccess(task, user);
+        Task task = getTaskOrThrow(id);
+        checkIsOwnerOrAssignee(task, user);
 
         task.setStatus(done ? Status.DONE : Status.WAITING);
 
@@ -75,9 +72,8 @@ public class TaskService {
     }
 
     public TaskResponse assignTask(Long id, Long assigneeId, User user) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        checkAccess(task, user);
+        Task task = getTaskOrThrow(id);
+        checkIsOwner(task, user);
 
         User assignee = userRepository.findById(assigneeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignee not found"));
@@ -104,27 +100,35 @@ public class TaskService {
     }
 
     public void deleteTask(Long id, User user) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        checkAccess(task, user);
+        Task task = getTaskOrThrow(id);
+        checkIsOwner(task, user);
         taskRepository.delete(task);
     }
 
-    private void checkAccess(Task task, User user) {
+    private Task getTaskOrThrow(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Задача не найдена"));
+    }
+
+    private void checkIsOwner(Task task, User user) {
         if (!task.getOwner().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not your task");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Только создатель может выполнять это действие");
+        }
+    }
+
+    private void checkIsOwnerOrAssignee(Task task, User user) {
+        boolean isOwner = task.getOwner().getId().equals(user.getId());
+        boolean isAssignee = task.getAssignee() != null && task.getAssignee().getId().equals(user.getId());
+
+        if (!isOwner && !isAssignee) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "У вас нет прав на эту задачу");
         }
     }
 
     private TaskResponse mapToResponse(Task task) {
         return new TaskResponse(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getStatus(),
-                task.getCreatedAt(),
-                task.getDoneAt(),
-                task.getOwner().getId(),
+                task.getId(), task.getTitle(), task.getDescription(), task.getStatus(),
+                task.getCreatedAt(), task.getDoneAt(), task.getOwner().getId(),
                 task.getAssignee() != null ? task.getAssignee().getId() : null
         );
     }
